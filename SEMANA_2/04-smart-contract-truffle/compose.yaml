@@ -1,0 +1,27 @@
+services:
+  ganache:
+    image: trufflesuite/ganache:latest
+    ports:
+      - "8545:8545"
+    command:
+      - --host
+      - 0.0.0.0
+      - --chain.chainId
+      - "1337"
+      - --chain.networkId
+      - "1337"
+      - --wallet.mnemonic
+      - test test test test test test test test test test test junk
+
+  truffle:
+    build: .
+    image: smart-contract-truffle-docker:1.0.0
+    working_dir: /app
+    volumes:
+      - .:/app
+      - truffle_node_modules:/app/node_modules
+    depends_on:
+      - ganache
+
+volumes:
+  truffle_node_modules:

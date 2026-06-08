@@ -1,0 +1,15 @@
+{
+  "name": "smart-contract-truffle-docker",
+  "version": "1.0.0",
+  "description": "Contrato Solidity simple con Truffle preparado para Docker Hub",
+  "scripts": {
+    "compile": "truffle compile",
+    "test": "truffle test",
+    "migrate": "truffle migrate --network development",
+    "interact": "truffle exec scripts/interact.js --network development"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "truffle": "^5.11.5"
+  }
+}

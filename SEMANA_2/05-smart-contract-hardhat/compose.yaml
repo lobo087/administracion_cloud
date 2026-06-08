@@ -1,0 +1,21 @@
+services:
+  hardhat-node:
+    build: .
+    command: npx hardhat node --hostname 0.0.0.0
+    ports:
+      - "8546:8545"
+    volumes:
+      - .:/app
+      - hardhat_node_modules:/app/node_modules
+
+  hardhat:
+    build: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - hardhat_node_modules:/app/node_modules
+    depends_on:
+      - hardhat-node
+
+volumes:
+  hardhat_node_modules:

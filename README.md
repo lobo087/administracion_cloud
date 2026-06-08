@@ -7,6 +7,7 @@ Semana a semana se iran subiendo carpetas con lo revisado en cada semana, incluy
 ## Estructura
 
 - `SEMANA_1/`: contenido correspondiente a la primera semana.
+- `SEMANA_2/`: ejercicios con Docker Compose, MySQL, persistencia y contratos inteligentes con Solidity.
 
 ## Licencia
 
