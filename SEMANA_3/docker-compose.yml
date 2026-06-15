@@ -1,0 +1,53 @@
+services:
+  blockchain-node:
+    image: trufflesuite/ganache
+    ports:
+      - "8545:8545"
+    command:
+      - --host
+      - 0.0.0.0
+      - --chain.chainId
+      - "1337"
+      - --wallet.deterministic
+      - --database.dbPath
+      - /data
+    volumes:
+      - ganache_data:/data
+
+  contract-tools:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    depends_on:
+      - blockchain-node
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-titulos_db}
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api-universidad:
+    build:
+      context: ./api-universidad
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - blockchain-node
+      - postgres
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@postgres:5432/${POSTGRES_DB:-titulos_db}
+
+volumes:
+  ganache_data:
+  postgres_data:
