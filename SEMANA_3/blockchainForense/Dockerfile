@@ -12,5 +12,5 @@ COPY contracts/ contracts/
 COPY scripts/ scripts/
 #COPY test/ test/
 
-#CMD ["npx", "hardhat", "run", "scripts/crear-titulo.ts"]
-CMD ["npx", "hardhat", "compile"]
+CMD ["npx", "hardhat", "run", "scripts/crear-evidencia.ts"]
+#CMD ["npx", "hardhat", "compile"]
