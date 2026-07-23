@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-auditora
+  namespace: auditora
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-auditora
+  template:
+    metadata:
+      labels:
+        app: api-auditora
+    spec:
+      containers:
+        - name: api-auditora
+          image: api-auditora:semana6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-auditora-config
+            - secretRef:
+                name: api-auditora-secret
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg://auditora:auditora123@postgres-auditora:5432/auditora_db
+            - name: CONTRACT_ADDRESS_FILE
+              value: /etc/registro-titulos/contract-address
+          volumeMounts:
+            - name: contract-address
+              mountPath: /etc/registro-titulos
+              readOnly: true
+      volumes:
+        - name: contract-address
+          configMap:
+            name: api-auditora-config
+            items:
+              - key: CONTRACT_ADDRESS
+                path: contract-address

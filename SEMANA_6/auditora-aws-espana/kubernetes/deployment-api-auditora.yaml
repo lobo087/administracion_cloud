@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-auditora
+  namespace: auditora
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-auditora
+  template:
+    metadata:
+      labels:
+        app: api-auditora
+    spec:
+      containers:
+        - name: api-auditora
+          image: api-auditora:semana6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-auditora-config
+            - secretRef:
+                name: api-auditora-secret
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg://auditora:auditora123@postgres-auditora:5432/auditora_db

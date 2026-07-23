@@ -1,0 +1,105 @@
+services:
+  blockchain-node:
+    image: trufflesuite/ganache
+    ports:
+      - "8545:8545"
+    command:
+      - --host
+      - 0.0.0.0
+      - --chain.chainId
+      - "1337"
+      - --wallet.deterministic
+      - --database.dbPath
+      - /data
+    volumes:
+      - ganache_data:/data
+
+  contract-tools:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    depends_on:
+      - blockchain-node
+    env_file:
+      - .env
+
+  postgres-universidad:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-titulos_db}
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  postgres-ministerio:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_MINISTERIO_DB:-ministerio_db}
+      POSTGRES_USER: ${POSTGRES_MINISTERIO_USER:-ministerio}
+      POSTGRES_PASSWORD: ${POSTGRES_MINISTERIO_PASSWORD:-ministerio123}
+    volumes:
+      - postgres_ministerio_data:/var/lib/postgresql/data
+
+  postgres-auditora:
+    image: postgres:16-alpine
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_AUDITORA_DB:-auditora_db}
+      POSTGRES_USER: ${POSTGRES_AUDITORA_USER:-auditora}
+      POSTGRES_PASSWORD: ${POSTGRES_AUDITORA_PASSWORD:-auditora123}
+    volumes:
+      - postgres_auditora_data:/var/lib/postgresql/data
+
+  api-universidad:
+    build:
+      context: ./api-universidad
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - blockchain-node
+      - postgres-universidad
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@postgres-universidad:5432/${POSTGRES_DB:-titulos_db}
+
+  api-ministerio:
+    build:
+      context: ./api-ministerio
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"
+    depends_on:
+      - blockchain-node
+      - postgres-ministerio
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_MINISTERIO_USER:-ministerio}:${POSTGRES_MINISTERIO_PASSWORD:-ministerio123}@postgres-ministerio:5432/${POSTGRES_MINISTERIO_DB:-ministerio_db}
+
+  api-auditora:
+    build:
+      context: ./api-auditora
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8000"
+    depends_on:
+      - blockchain-node
+      - postgres-auditora
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_AUDITORA_USER:-auditora}:${POSTGRES_AUDITORA_PASSWORD:-auditora123}@postgres-auditora:5432/${POSTGRES_AUDITORA_DB:-auditora_db}
+
+volumes:
+  ganache_data:
+  postgres_data:
+  postgres_ministerio_data:
+  postgres_auditora_data:

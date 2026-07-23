@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-auditora-config
+  namespace: auditora
+data:
+  INSTITUCION_NOMBRE: Auditora AWS Espana

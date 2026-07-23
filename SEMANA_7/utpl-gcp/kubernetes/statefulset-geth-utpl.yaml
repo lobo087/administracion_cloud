@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: geth-utpl
+  namespace: utpl
+spec:
+  serviceName: geth-utpl
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geth-utpl
+  template:
+    metadata:
+      labels:
+        app: geth-utpl
+    spec:
+      containers:
+        - name: geth
+          image: ethereum/client-go:v1.13.15
+          ports:
+            - containerPort: 8545
+            - containerPort: 30303
+          env:
+            - name: PRIVATE_KEY_GETH
+              value: "4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              if [ ! -d /data/geth/chaindata ]; then geth --datadir /data init /config/genesis.json; fi
+              printf "%s" "$PRIVATE_KEY_GETH" > /tmp/privatekey
+              : > /tmp/password
+              geth --datadir /data account import --password /tmp/password /tmp/privatekey || true
+              cp /config/static-nodes.json /data/geth/static-nodes.json
+              exec geth --datadir /data --networkid 202606 --syncmode full --http --http.addr 0.0.0.0 --http.port 8545 --http.api eth,net,web3,admin,personal,miner,clique --http.vhosts "*" --http.corsdomain "*" --port 30303 --mine --miner.etherbase 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 --unlock 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 --password /tmp/password --allow-insecure-unlock
+          volumeMounts:
+            - name: geth-data
+              mountPath: /data
+            - name: geth-config
+              mountPath: /config
+      volumes:
+        - name: geth-data
+          persistentVolumeClaim:
+            claimName: geth-utpl-data
+        - name: geth-config
+          configMap:
+            name: geth-utpl-config

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: geth-auditora
+  namespace: auditora
+spec:
+  serviceName: geth-auditora
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geth-auditora
+  template:
+    metadata:
+      labels:
+        app: geth-auditora
+    spec:
+      containers:
+        - name: geth
+          image: ethereum/client-go:v1.13.15
+          ports:
+            - containerPort: 8545
+            - containerPort: 30303
+          env:
+            - name: PRIVATE_KEY_GETH
+              value: "6370fd033414d63c8dbdc28a482b50146d244dfc1510aa5676bb7c2e618af9c2"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              if [ ! -d /data/geth/chaindata ]; then geth --datadir /data init /config/genesis.json; fi
+              printf "%s" "$PRIVATE_KEY_GETH" > /tmp/privatekey
+              : > /tmp/password
+              geth --datadir /data account import --password /tmp/password /tmp/privatekey || true
+              cp /config/static-nodes.json /data/geth/static-nodes.json
+              exec geth --datadir /data --networkid 202606 --syncmode full --http --http.addr 0.0.0.0 --http.port 8545 --http.api eth,net,web3,admin,personal,miner,clique --http.vhosts "*" --http.corsdomain "*" --port 30303 --mine --miner.etherbase 0xcc6bfb2198f6511348151e403960aea2d166a694 --unlock 0xcc6bfb2198f6511348151e403960aea2d166a694 --password /tmp/password --allow-insecure-unlock
+          volumeMounts:
+            - name: geth-data
+              mountPath: /data
+            - name: geth-config
+              mountPath: /config
+      volumes:
+        - name: geth-data
+          persistentVolumeClaim:
+            claimName: geth-auditora-data
+        - name: geth-config
+          configMap:
+            name: geth-auditora-config

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blockchain-shared
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: deploy-contract-secret
+  namespace: blockchain-shared
+type: Opaque
+stringData:
+  PRIVATE_KEY_DEPLOYER: "0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1"
+  MINISTERIO_ADDRESS: "0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0"
+  UNIVERSIDAD_ADDRESS: "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
+  UNIVERSIDAD_NOMBRE: UTPL
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deploy-contract-config
+  namespace: blockchain-shared
+data:
+  BLOCKCHAIN_RPC_URL: http://geth-ministerio.ministerio.svc.cluster.local:8545
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-registro-titulos
+  namespace: blockchain-shared
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: hardhat
+          image: registro-titulos-hardhat:semana7
+          imagePullPolicy: IfNotPresent
+          command:
+            - npx
+            - hardhat
+            - run
+            - scripts/deploy-registro-titulos.ts
+            - --network
+            - redAcademica
+          envFrom:
+            - configMapRef:
+                name: deploy-contract-config
+            - secretRef:
+                name: deploy-contract-secret

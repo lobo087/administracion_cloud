@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-universidad
+  namespace: utpl
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-universidad
+  template:
+    metadata:
+      labels:
+        app: api-universidad
+    spec:
+      containers:
+        - name: api-universidad
+          image: api-universidad:semana6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-universidad-config
+            - secretRef:
+                name: api-universidad-secret
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg://admin:admin123@postgres-universidad:5432/titulos_db
+            - name: CONTRACT_ADDRESS_FILE
+              value: /etc/registro-titulos/contract-address
+          volumeMounts:
+            - name: contract-address
+              mountPath: /etc/registro-titulos
+              readOnly: true
+      volumes:
+        - name: contract-address
+          configMap:
+            name: api-universidad-config
+            items:
+              - key: CONTRACT_ADDRESS
+                path: contract-address

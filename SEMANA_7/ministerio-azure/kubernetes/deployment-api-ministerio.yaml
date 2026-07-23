@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-ministerio
+  namespace: ministerio
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-ministerio
+  template:
+    metadata:
+      labels:
+        app: api-ministerio
+    spec:
+      containers:
+        - name: api-ministerio
+          image: api-ministerio:semana6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-ministerio-config
+            - secretRef:
+                name: api-ministerio-secret
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg://ministerio:ministerio123@postgres-ministerio:5432/ministerio_db
+            - name: CONTRACT_ADDRESS_FILE
+              value: /etc/registro-titulos/contract-address
+          volumeMounts:
+            - name: contract-address
+              mountPath: /etc/registro-titulos
+              readOnly: true
+      volumes:
+        - name: contract-address
+          configMap:
+            name: api-ministerio-config
+            items:
+              - key: CONTRACT_ADDRESS
+                path: contract-address

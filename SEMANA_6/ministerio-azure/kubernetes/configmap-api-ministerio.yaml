@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-ministerio-config
+  namespace: ministerio
+data:
+  INSTITUCION_NOMBRE: Ministerio Ecuador

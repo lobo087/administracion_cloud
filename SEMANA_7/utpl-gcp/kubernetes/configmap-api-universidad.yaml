@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-universidad-config
+  namespace: utpl
+data:
+  BLOCKCHAIN_RPC_URL: http://geth-utpl:8545
+  UNIVERSIDAD_NOMBRE: UTPL
+  CONTRACT_ADDRESS: "0xd3aa556287afe63102e5797bfddd2a1e8dbb3ea5"

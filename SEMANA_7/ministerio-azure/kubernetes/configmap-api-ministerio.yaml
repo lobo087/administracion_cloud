@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-ministerio-config
+  namespace: ministerio
+data:
+  BLOCKCHAIN_RPC_URL: http://geth-ministerio:8545
+  CONTRACT_ADDRESS: "0xREEMPLAZAR_CON_DIRECCION_DEL_CONTRATO"

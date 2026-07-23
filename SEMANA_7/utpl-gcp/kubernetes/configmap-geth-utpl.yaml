@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geth-utpl-config
+  namespace: utpl
+data:
+  genesis.json: |
+    {
+      "config": { "chainId": 202606, "homesteadBlock": 0, "eip150Block": 0, "eip155Block": 0, "eip158Block": 0, "byzantiumBlock": 0, "constantinopleBlock": 0, "petersburgBlock": 0, "istanbulBlock": 0, "berlinBlock": 0, "londonBlock": 0, "clique": { "period": 5, "epoch": 30000 } },
+      "difficulty": "1",
+      "gasLimit": "8000000",
+      "extradata": "0x000000000000000000000000000000000000000000000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1cc6bfb2198f6511348151e403960aea2d166a694ffcf8fdee72ac11b5c542428b35eef5769c409f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "alloc": { "90f8bf6a479f320ead074411a4b0e7944ea8c9c1": { "balance": "1000000000000000000000000" }, "ffcf8fdee72ac11b5c542428b35eef5769c409f0": { "balance": "1000000000000000000000000" }, "22d491bde2303f2f43325b2108c7e439c87a1243": { "balance": "1000000000000000000000000" }, "cc6bfb2198f6511348151e403960aea2d166a694": { "balance": "1000000000000000000000000" } }
+    }
+  static-nodes.json: |
+    []

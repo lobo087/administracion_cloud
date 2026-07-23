@@ -1,0 +1,111 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"},
+      {"indexed": true, "internalType": "address", "name": "ministerioValidador", "type": "address"}
+    ],
+    "name": "TituloAvalado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"},
+      {"indexed": true, "internalType": "bytes32", "name": "documentoHash", "type": "bytes32"},
+      {"indexed": true, "internalType": "bytes32", "name": "identificacionEstudianteHash", "type": "bytes32"},
+      {"indexed": false, "internalType": "string", "name": "universidadEmisora", "type": "string"},
+      {"indexed": false, "internalType": "string", "name": "carrera", "type": "string"},
+      {"indexed": false, "internalType": "string", "name": "tituloObtenido", "type": "string"},
+      {"indexed": false, "internalType": "address", "name": "universidad", "type": "address"}
+    ],
+    "name": "TituloRegistrado",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"}
+    ],
+    "name": "avalarTitulo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "listarCodigosTitulos",
+    "outputs": [
+      {"internalType": "bytes32[]", "name": "", "type": "bytes32[]"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"}
+    ],
+    "name": "obtenerTitulo",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"},
+          {"internalType": "bytes32", "name": "documentoHash", "type": "bytes32"},
+          {"internalType": "bytes32", "name": "identificacionEstudianteHash", "type": "bytes32"},
+          {"internalType": "string", "name": "universidadEmisora", "type": "string"},
+          {"internalType": "string", "name": "carrera", "type": "string"},
+          {"internalType": "string", "name": "tituloObtenido", "type": "string"},
+          {"internalType": "address", "name": "universidad", "type": "address"},
+          {"internalType": "address", "name": "ministerioValidador", "type": "address"},
+          {"internalType": "enum RegistroTitulos.EstadoTitulo", "name": "estado", "type": "uint8"},
+          {"internalType": "uint256", "name": "fechaRegistro", "type": "uint256"},
+          {"internalType": "uint256", "name": "fechaAval", "type": "uint256"},
+          {"internalType": "bool", "name": "existe", "type": "bool"}
+        ],
+        "internalType": "struct RegistroTitulos.Titulo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"},
+      {"internalType": "bytes32", "name": "documentoHash", "type": "bytes32"},
+      {"internalType": "bytes32", "name": "identificacionEstudianteHash", "type": "bytes32"},
+      {"internalType": "string", "name": "universidadEmisora", "type": "string"},
+      {"internalType": "string", "name": "carrera", "type": "string"},
+      {"internalType": "string", "name": "tituloObtenido", "type": "string"}
+    ],
+    "name": "registrarTitulo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalTitulos",
+    "outputs": [
+      {"internalType": "uint256", "name": "", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "bytes32", "name": "codigoTituloHash", "type": "bytes32"},
+      {"internalType": "bytes32", "name": "documentoHash", "type": "bytes32"},
+      {"internalType": "bytes32", "name": "identificacionEstudianteHash", "type": "bytes32"}
+    ],
+    "name": "verificarTitulo",
+    "outputs": [
+      {"internalType": "bool", "name": "existe", "type": "bool"},
+      {"internalType": "bool", "name": "documentoCoincide", "type": "bool"},
+      {"internalType": "bool", "name": "identificacionCoincide", "type": "bool"},
+      {"internalType": "enum RegistroTitulos.EstadoTitulo", "name": "estado", "type": "uint8"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-ministerio
+  namespace: ministerio
+spec:
+  selector:
+    app: postgres-ministerio
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
