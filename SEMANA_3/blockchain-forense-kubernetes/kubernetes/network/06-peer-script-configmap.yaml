@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geth-peer-script
+  namespace: blockchain-forense
+data:
+  configure_peers.py: |
+    import json
+    import re
+    import time
+    import urllib.request
+
+    nodes = {
+        "utpl": ("http://geth-utpl:8545", "geth-utpl:30303"),
+        "ministerio": (
+            "http://geth-ministerio:8545",
+            "geth-ministerio:30303",
+        ),
+        "auditora": (
+            "http://geth-auditora:8545",
+            "geth-auditora:30303",
+        ),
+    }
+
+    def rpc(url, method, params=None):
+        payload = json.dumps({
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": method,
+            "params": params or [],
+        }).encode("utf-8")
+        request = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=10) as response:
+            body = json.loads(response.read().decode("utf-8"))
+        if "error" in body:
+            raise RuntimeError(f"{method}: {body['error']}")
+        return body.get("result")
+
+    def wait_rpc(name, url):
+        for attempt in range(60):
+            try:
+                chain_id = rpc(url, "eth_chainId")
+                print(f"{name}: RPC disponible; chainId={chain_id}")
+                return
+            except Exception as exc:
+                print(
+                    f"{name}: esperando RPC "
+                    f"({attempt + 1}/60): {exc}"
+                )
+                time.sleep(3)
+        raise RuntimeError(f"RPC no disponible para {name}")
+
+    for node_name, (url, _p2p) in nodes.items():
+        wait_rpc(node_name, url)
+
+    enodes = {}
+    for node_name, (url, p2p_host) in nodes.items():
+        info = rpc(url, "admin_nodeInfo")
+        original = info["enode"]
+        enode = re.sub(r"@[^?]+", f"@{p2p_host}", original)
+        enodes[node_name] = enode
+        print(f"{node_name}: {enode}")
+
+    for source_name, (source_url, _source_p2p) in nodes.items():
+        for target_name, target_enode in enodes.items():
+            if source_name == target_name:
+                continue
+            result = rpc(
+                source_url,
+                "admin_addPeer",
+                [target_enode],
+            )
+            print(
+                f"peer {source_name} -> "
+                f"{target_name}: {result}"
+            )
+
+    time.sleep(8)
+    for node_name, (url, _p2p) in nodes.items():
+        peer_count = int(rpc(url, "net_peerCount"), 16)
+        block_number = int(rpc(url, "eth_blockNumber"), 16)
+        print(
+            f"{node_name}: peers={peer_count}; "
+            f"bloque={block_number}"
+        )
+        if peer_count < 2:
+            raise RuntimeError(
+                f"{node_name} no tiene los dos peers esperados"
+            )
+
+    print("PEERING_OK=true")

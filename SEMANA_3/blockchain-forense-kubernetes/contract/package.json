@@ -1,0 +1,17 @@
+{
+  "name": "registro-evidencias-forenses-kubernetes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy-registro-evidencias.ts --network redForense"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "5.0.7",
+    "@types/node": "22.19.21",
+    "hardhat": "3.9.0",
+    "typescript": "6.0.3",
+    "viem": "2.52.2"
+  }
+}

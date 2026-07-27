@@ -1,0 +1,242 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: geth-utpl
+  namespace: blockchain-forense
+  labels:
+    app: geth-utpl
+spec:
+  serviceName: geth-utpl
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geth-utpl
+  template:
+    metadata:
+      labels:
+        app: geth-utpl
+        component: blockchain-node
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: geth
+          image: ethereum/client-go:v1.13.15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: rpc
+              containerPort: 8545
+            - name: p2p-tcp
+              containerPort: 30303
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: 30303
+              protocol: UDP
+          env:
+            - name: PRIVATE_KEY_GETH
+              valueFrom:
+                secretKeyRef:
+                  name: blockchain-demo-keys
+                  key: UTPL_PRIVATE_KEY
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              if [ ! -d /data/geth/chaindata ]; then
+                geth --datadir /data init /config/genesis.json
+              fi
+              printf "%s" "$PRIVATE_KEY_GETH" > /tmp/privatekey
+              : > /tmp/password
+              geth --datadir /data account import                 --password /tmp/password /tmp/privatekey || true
+              exec geth                 --datadir /data                 --networkid 202606                 --syncmode full                 --http                 --http.addr 0.0.0.0                 --http.port 8545                 --http.api eth,net,web3,admin,miner,clique                 --http.vhosts "*"                 --http.corsdomain "*"                 --port 30303                 --nodiscover                 --mine                 --miner.etherbase 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1                 --unlock 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1                 --password /tmp/password                 --allow-insecure-unlock                 --cache 128                 --verbosity 3
+          readinessProbe:
+            tcpSocket:
+              port: 8545
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 20
+          livenessProbe:
+            tcpSocket:
+              port: 8545
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - name: geth-data
+              mountPath: /data
+            - name: genesis
+              mountPath: /config
+      volumes:
+        - name: geth-data
+          persistentVolumeClaim:
+            claimName: geth-utpl-data
+        - name: genesis
+          configMap:
+            name: geth-genesis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: geth-ministerio
+  namespace: blockchain-forense
+  labels:
+    app: geth-ministerio
+spec:
+  serviceName: geth-ministerio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geth-ministerio
+  template:
+    metadata:
+      labels:
+        app: geth-ministerio
+        component: blockchain-node
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: geth
+          image: ethereum/client-go:v1.13.15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: rpc
+              containerPort: 8545
+            - name: p2p-tcp
+              containerPort: 30303
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: 30303
+              protocol: UDP
+          env:
+            - name: PRIVATE_KEY_GETH
+              valueFrom:
+                secretKeyRef:
+                  name: blockchain-demo-keys
+                  key: MINISTERIO_PRIVATE_KEY
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              if [ ! -d /data/geth/chaindata ]; then
+                geth --datadir /data init /config/genesis.json
+              fi
+              printf "%s" "$PRIVATE_KEY_GETH" > /tmp/privatekey
+              : > /tmp/password
+              geth --datadir /data account import                 --password /tmp/password /tmp/privatekey || true
+              exec geth                 --datadir /data                 --networkid 202606                 --syncmode full                 --http                 --http.addr 0.0.0.0                 --http.port 8545                 --http.api eth,net,web3,admin,miner,clique                 --http.vhosts "*"                 --http.corsdomain "*"                 --port 30303                 --nodiscover                 --mine                 --miner.etherbase 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0                 --unlock 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0                 --password /tmp/password                 --allow-insecure-unlock                 --cache 128                 --verbosity 3
+          readinessProbe:
+            tcpSocket:
+              port: 8545
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 20
+          livenessProbe:
+            tcpSocket:
+              port: 8545
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - name: geth-data
+              mountPath: /data
+            - name: genesis
+              mountPath: /config
+      volumes:
+        - name: geth-data
+          persistentVolumeClaim:
+            claimName: geth-ministerio-data
+        - name: genesis
+          configMap:
+            name: geth-genesis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: geth-auditora
+  namespace: blockchain-forense
+  labels:
+    app: geth-auditora
+spec:
+  serviceName: geth-auditora
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geth-auditora
+  template:
+    metadata:
+      labels:
+        app: geth-auditora
+        component: blockchain-node
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: geth
+          image: ethereum/client-go:v1.13.15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: rpc
+              containerPort: 8545
+            - name: p2p-tcp
+              containerPort: 30303
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: 30303
+              protocol: UDP
+          env:
+            - name: PRIVATE_KEY_GETH
+              valueFrom:
+                secretKeyRef:
+                  name: blockchain-demo-keys
+                  key: AUDITORA_PRIVATE_KEY
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              if [ ! -d /data/geth/chaindata ]; then
+                geth --datadir /data init /config/genesis.json
+              fi
+              printf "%s" "$PRIVATE_KEY_GETH" > /tmp/privatekey
+              : > /tmp/password
+              geth --datadir /data account import                 --password /tmp/password /tmp/privatekey || true
+              exec geth                 --datadir /data                 --networkid 202606                 --syncmode full                 --http                 --http.addr 0.0.0.0                 --http.port 8545                 --http.api eth,net,web3,admin,miner,clique                 --http.vhosts "*"                 --http.corsdomain "*"                 --port 30303                 --nodiscover                 --mine                 --miner.etherbase 0xcc6bfb2198f6511348151e403960aea2d166a694                 --unlock 0xcc6bfb2198f6511348151e403960aea2d166a694                 --password /tmp/password                 --allow-insecure-unlock                 --cache 128                 --verbosity 3
+          readinessProbe:
+            tcpSocket:
+              port: 8545
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 20
+          livenessProbe:
+            tcpSocket:
+              port: 8545
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - name: geth-data
+              mountPath: /data
+            - name: genesis
+              mountPath: /config
+      volumes:
+        - name: geth-data
+          persistentVolumeClaim:
+            claimName: geth-auditora-data
+        - name: genesis
+          configMap:
+            name: geth-genesis

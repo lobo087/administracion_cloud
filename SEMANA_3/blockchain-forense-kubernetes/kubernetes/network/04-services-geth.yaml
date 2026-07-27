@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: geth-utpl
+  namespace: blockchain-forense
+spec:
+  selector:
+    app: geth-utpl
+  ports:
+    - name: rpc
+      port: 8545
+      targetPort: 8545
+    - name: p2p-tcp
+      port: 30303
+      targetPort: 30303
+      protocol: TCP
+    - name: p2p-udp
+      port: 30303
+      targetPort: 30303
+      protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geth-ministerio
+  namespace: blockchain-forense
+spec:
+  selector:
+    app: geth-ministerio
+  ports:
+    - name: rpc
+      port: 8545
+      targetPort: 8545
+    - name: p2p-tcp
+      port: 30303
+      targetPort: 30303
+      protocol: TCP
+    - name: p2p-udp
+      port: 30303
+      targetPort: 30303
+      protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geth-auditora
+  namespace: blockchain-forense
+spec:
+  selector:
+    app: geth-auditora
+  ports:
+    - name: rpc
+      port: 8545
+      targetPort: 8545
+    - name: p2p-tcp
+      port: 30303
+      targetPort: 30303
+      protocol: TCP
+    - name: p2p-udp
+      port: 30303
+      targetPort: 30303
+      protocol: UDP

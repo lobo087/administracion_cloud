@@ -1,0 +1,40 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.48",
+    ranksep="0.60", fontname="DejaVu Sans",
+    label="Arquitectura de despliegue de la API forense",
+    labelloc=t, fontsize=22, splines=ortho];
+  node [shape=box, style="rounded,filled", fillcolor="#F5F7FA",
+    color="#34495E", fontname="DejaVu Sans", fontsize=13,
+    penwidth=1.4, margin="0.18,0.12"];
+  edge [color="#4B5563", penwidth=1.3, arrowsize=0.8];
+
+  cliente [label="Cliente / investigador", fillcolor="#FFF7E6"];
+  service [label="Service forense-api\nClusterIP", fillcolor="#E8F4FD"];
+
+  subgraph cluster_deployment {
+    label="Deployment: forense-api  |  replicas: 3";
+    color="#2F6B9A"; penwidth=1.6; style="rounded,dashed";
+    fontname="DejaVu Sans"; fontsize=15; labelloc=t;
+
+    rs [label="ReplicaSet administrado por Kubernetes",
+      fillcolor="#EAF2F8"];
+    p1 [label="Pod API 1\nNode.js + viem", fillcolor="#EAF7EE"];
+    p2 [label="Pod API 2\nNode.js + viem", fillcolor="#EAF7EE"];
+    p3 [label="Pod API 3\nNode.js + viem", fillcolor="#EAF7EE"];
+    {rank=same; p1; p2; p3;}
+
+    rs -> p1;
+    rs -> p2;
+    rs -> p3;
+  }
+
+  rpc [label="Service RPC\ngeth-utpl:8545", fillcolor="#F3E8FF"];
+
+  cliente -> service;
+  service -> p1 [color="#2F6B9A"];
+  service -> p2 [color="#2F6B9A"];
+  service -> p3 [color="#2F6B9A"];
+  p1 -> rpc;
+  p2 -> rpc;
+  p3 -> rpc;
+}

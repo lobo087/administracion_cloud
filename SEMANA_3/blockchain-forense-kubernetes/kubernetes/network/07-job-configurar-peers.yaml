@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: configurar-peers-geth
+  namespace: blockchain-forense
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        job: configurar-peers-geth
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: peer-configurator
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["python", "/scripts/configure_peers.py"]
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: geth-peer-script

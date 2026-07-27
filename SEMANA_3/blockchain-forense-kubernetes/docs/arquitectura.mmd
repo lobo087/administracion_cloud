@@ -1,0 +1,31 @@
+flowchart TB
+    U[Usuario / investigador] --> SVC[Service forense-api]
+
+    subgraph DEP[Deployment forense-api - replicas: 3]
+        RS[ReplicaSet]
+        P1[Pod API 1]
+        P2[Pod API 2]
+        P3[Pod API 3]
+        RS --> P1
+        RS --> P2
+        RS --> P3
+    end
+
+    SVC --> P1
+    SVC --> P2
+    SVC --> P3
+
+    P1 --> GU[Service geth-utpl]
+    P2 --> GU
+    P3 --> GU
+
+    GU --> N1[StatefulSet Geth UTPL]
+    GM[Service geth-ministerio] --> N2[StatefulSet Geth Ministerio]
+    GA[Service geth-auditora] --> N3[StatefulSet Geth Auditora]
+
+    N1 <--> N2
+    N1 <--> N3
+    N2 <--> N3
+
+    J[Job Hardhat] --> GM
+    J --> SC[RegistroEvidenciasForenses]

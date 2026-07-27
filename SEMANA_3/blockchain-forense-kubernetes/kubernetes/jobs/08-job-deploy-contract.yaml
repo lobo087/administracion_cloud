@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deploy-contract-config
+  namespace: blockchain-forense
+data:
+  BLOCKCHAIN_RPC_URL: http://geth-ministerio:8545
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-registro-evidencias
+  namespace: blockchain-forense
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 1800
+  template:
+    metadata:
+      labels:
+        job: deploy-registro-evidencias
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: hardhat-deployer
+          image: forense-contract:1.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - npx
+            - hardhat
+            - run
+            - scripts/deploy-registro-evidencias.ts
+            - --network
+            - redForense
+          envFrom:
+            - configMapRef:
+                name: deploy-contract-config
+            - secretRef:
+                name: blockchain-demo-keys
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi

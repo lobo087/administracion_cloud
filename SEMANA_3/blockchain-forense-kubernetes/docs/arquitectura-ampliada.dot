@@ -1,0 +1,54 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.42",
+    ranksep="0.60", fontname="DejaVu Sans",
+    label="Arquitectura ampliada: Kubernetes y red blockchain privada",
+    labelloc=t, fontsize=22];
+  node [shape=box, style="rounded,filled", fillcolor="#F5F7FA",
+    color="#34495E", fontname="DejaVu Sans", fontsize=12,
+    penwidth=1.3, margin="0.16,0.10"];
+  edge [color="#4B5563", penwidth=1.2, arrowsize=0.75,
+    fontname="DejaVu Sans", fontsize=10];
+
+  user [label="Usuario / investigador", fillcolor="#FFF7E6"];
+  apiSvc [label="Service forense-api\nClusterIP", fillcolor="#E8F4FD"];
+
+  subgraph cluster_api {
+    label="Deployment forense-api (3 réplicas)";
+    color="#2F6B9A"; style="rounded,dashed"; penwidth=1.5;
+    rs [label="ReplicaSet", fillcolor="#EAF2F8"];
+    api1 [label="Pod API 1", fillcolor="#EAF7EE"];
+    api2 [label="Pod API 2", fillcolor="#EAF7EE"];
+    api3 [label="Pod API 3", fillcolor="#EAF7EE"];
+    rs -> api1; rs -> api2; rs -> api3;
+  }
+
+  subgraph cluster_bc {
+    label="Red Ethereum privada - Clique PoA";
+    color="#7D3C98"; style="rounded,dashed"; penwidth=1.5;
+    s1 [label="Service geth-utpl", fillcolor="#F3E8FF"];
+    s2 [label="Service geth-ministerio", fillcolor="#F3E8FF"];
+    s3 [label="Service geth-auditora", fillcolor="#F3E8FF"];
+    n1 [label="StatefulSet / Pod Geth UTPL\n+ PVC", fillcolor="#F9EBEA"];
+    n2 [label="StatefulSet / Pod Geth Ministerio\n+ PVC", fillcolor="#F9EBEA"];
+    n3 [label="StatefulSet / Pod Geth Auditora\n+ PVC", fillcolor="#F9EBEA"];
+    s1 -> n1; s2 -> n2; s3 -> n3;
+    n1 -> n2 [dir=both, label="P2P"];
+    n1 -> n3 [dir=both, label="P2P"];
+    n2 -> n3 [dir=both, label="P2P"];
+  }
+
+  peerJob [label="Job configurar-peers-geth\nPod Python",
+    fillcolor="#FDEBD0"];
+  deployJob [label="Job deploy-registro-evidencias\nPod Hardhat 3",
+    fillcolor="#FDEBD0"];
+  contract [label="Smart contract\nRegistroEvidenciasForenses",
+    shape=component, fillcolor="#FCF3CF"];
+
+  user -> apiSvc;
+  apiSvc -> api1; apiSvc -> api2; apiSvc -> api3;
+  api1 -> s1; api2 -> s1; api3 -> s1;
+  peerJob -> s1; peerJob -> s2; peerJob -> s3;
+  deployJob -> s2;
+  deployJob -> contract;
+  contract -> n2 [style=dashed, label="transacción"];
+}
