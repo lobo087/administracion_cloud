@@ -247,8 +247,4 @@ La práctica integra el despliegue de blockchain y la orquestación de aplicacio
 
 La solución demuestra que Kubernetes no modifica la lógica del smart contract; su función es administrar los contenedores, la red interna, la configuración, el almacenamiento y la disponibilidad de los componentes que compilan, despliegan y consumen el contrato. En conjunto, el proyecto permite registrar hashes de evidencias digitales, verificar su integridad y demostrar el comportamiento de recuperación automática requerido por la actividad.
 
-## Referencias consultadas
 
-Lobo087. (s. f.). *Semana 7 - Red blockchain privada con Geth en Kubernetes*. GitHub. https://github.com/lobo087/administracion_cloud/tree/main/SEMANA_7
-
-Lobo087. (s. f.). *Blockchain Forense - Registro de Evidencias Digitales*. GitHub. https://github.com/lobo087/administracion_cloud/tree/main/SEMANA_3/blockchainForense
